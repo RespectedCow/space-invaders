@@ -2,9 +2,9 @@
 import time
 import pygame
 from random import randrange
-from time import sleep
 
 import settings
+from src import sounds
 
 # Settings
 asteroid_spawn_y = 20
@@ -147,6 +147,8 @@ class Spaceship(pygame.sprite.Sprite):
         self.bullets.add(newBullet2)
         
         self.last_shoot = time.time()
+        
+        sounds.bullet1_sound.play()
             
     def update(self):
         if self.rect.left < 0:

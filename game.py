@@ -4,10 +4,10 @@
 import time
 import pygame
 from sys import exit
-import threading
 
 import settings
 from src import objects
+from src import sounds
 
 # Variables
 running = True
@@ -19,8 +19,10 @@ next_tick = pygame.time.get_ticks() + interval
 
 last_time = time.time()
 
-# Set attributes
+# Init pygame
 pygame.init()
+
+# Set attributes
 screen = pygame.display.set_mode(settings.GAME_WINDOW_SIZE)
 GAME_FONT = pygame.font.Font("./assets/fonts/fonts.ttf", 50)
 pygame.display.set_caption("Space Invaders")
@@ -72,6 +74,8 @@ except Exception as error:
     quit()
 
 pygame.display.update()
+
+# sounds.space_music.play()
 
 # The game loop
 try:
