@@ -7,7 +7,6 @@ from sys import exit
 
 import settings
 from src import objects
-from src import sounds
 
 # Variables
 running = True
@@ -23,15 +22,20 @@ last_time = time.time()
 pygame.init()
 
 # Set attributes
-screen = pygame.display.set_mode(settings.GAME_WINDOW_SIZE)
+org_screen = pygame.display.set_mode(settings.GAME_WINDOW_SIZE)
+screen = org_screen.copy()
+screen_rect = screen.get_rect()
 GAME_FONT = pygame.font.Font("./assets/fonts/fonts.ttf", 50)
 pygame.display.set_caption("Space Invaders")
 clock = pygame.time.Clock()
 
 # Declare objects
-player = objects.Spaceship(10, 700 - 100 - 10, 100, 100)
+player = objects.Spaceship(10, settings.GAME_WINDOW_SIZE[1] - 120 - 10, 100, 120)
 asteroidGenerator = objects.Generator(0, 5, 50, 2)
 gameBackground = objects.Background('./assets/imgs/spacebackground2.png', [0, 0])
+
+offset = (0, 0)
+last_shake = time.time()
 
 score = 0
 score_label = GAME_FONT.render(str(score), True, (255, 255, 255))
@@ -65,6 +69,16 @@ def display_surfaces(surfaces):
             screen.blit(surface, position)
         else:
             screen.blit(surface.image, surface.rect)
+        
+def shake(offset):
+    shake_offset = 0
+    
+    if offset[0] >= 0:
+        shake_offset = -2
+    else:
+        shake_offset = 2
+        
+    return (shake_offset, 0)
             
 # Place threads here
 try:
@@ -91,7 +105,8 @@ try:
                 quit()
                 
         # Fill the background
-        screen.fill((0, 0, 0))
+        org_screen.fill((0, 0, 0))
+        screen.fill((255,255,255))
             
         keys = pygame.key.get_pressed()  
         speed = 5
@@ -128,7 +143,12 @@ try:
                     # Destroy the bullet
                     bullet.kill()
         
+        # if time.time() - last_shake > 0.3:
+        #     offset = shake(offset)
+        
         # Display them here
+        # org_screen.blit(gameBackground.image, gameBackground.rect)
+        
         display_surfaces([
             (gameBackground.image, gameBackground.rect),
             (player.image, player.rect),
@@ -138,7 +158,7 @@ try:
         display_surfaces(player.bullets)
         display_surfaces(asteroidGenerator.asteroids)
         
-        # Game time management
+        org_screen.blit(screen, offset)
         
         pygame.display.update()
         clock.tick(60)

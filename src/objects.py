@@ -65,7 +65,6 @@ class Generator:
         
         newAsteroid.health = hp + hp_increase
         
-        print(newAsteroid)
         return newAsteroid
     
     def update(self):
@@ -78,8 +77,6 @@ class Generator:
             
             for i in range(0, asteroidAmount):
                 self.generate_asteroid()
-            
-            print(self.asteroids)
             
     def generate_asteroid(self):
         if self.score >= 10:
@@ -105,16 +102,28 @@ class Generator:
 class Spaceship(pygame.sprite.Sprite):
     def __init__(self, dx, dy, sx, sy):
         super().__init__()
-        self.image = pygame.image.load("./assets/imgs/Spaceship.png").convert_alpha()
+        self.animations = [
+            pygame.image.load("./assets/imgs/spaceship1.png"),
+            pygame.image.load("./assets/imgs/spaceship2.png"),
+            pygame.image.load("./assets/imgs/spaceship3.png")
+        ]
         
+        index = 0
+        for anim in self.animations:
+            self.animations[index] = anim.convert_alpha()
+            
+            # Change the size of the spaceship
+            self.animations[index] = pygame.transform.scale(anim, (sx, sy))
+            self.size_x = sx
+            self.size_y = sy
+            
+            index += 1
+            
+        self.image = self.animations[0]
+            
         self.rect = self.image.get_rect()
         self.rect.x = dx
-        self.rect.y = dy
-        
-        # Change the size of the spaceship
-        self.image = pygame.transform.scale(self.image, (sx, sy))
-        self.size_x = sx
-        self.size_y = sy
+        self.rect.y = dy        
         
         # Class variables
         self.vel_x = 0
@@ -126,10 +135,15 @@ class Spaceship(pygame.sprite.Sprite):
         
         self.friction = 1
         self.firerate = 0.2
+        self.anim_rate = 0.1
+        self.anim_count = 0
+        self.last_anim = time.time()
         
         self.shouldShoot = False
         self.gameRun = True
         self.last_shoot = None
+        
+        sounds.rocket_sound.play(-1)
         
     def move_x(self, x, delta):
         if x < 0: # Some rounding corrections
@@ -164,7 +178,16 @@ class Spaceship(pygame.sprite.Sprite):
         if self.shouldShoot:
             if time.time() - self.last_shoot > self.firerate:
                 self.shouldShoot = False
-                
+        
+        if time.time() - self.last_anim > self.anim_rate:
+            self.last_anim = time.time()
+            
+            # Update frame value
+            if self.anim_count < 2:
+                self.anim_count += 1
+            else:
+                self.anim_count = 0
+            self.image = self.animations[self.anim_count]
 
 class Asteroid(pygame.sprite.Sprite):
     
