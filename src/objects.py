@@ -133,6 +133,7 @@ class Spaceship(pygame.sprite.Sprite):
         
         self.bullets = pygame.sprite.Group()
         
+        self.hp = 3
         self.friction = 1
         self.firerate = 0.2
         self.anim_rate = 0.1
@@ -142,6 +143,12 @@ class Spaceship(pygame.sprite.Sprite):
         self.shouldShoot = False
         self.gameRun = True
         self.last_shoot = None
+        self.shouldShow = True
+        
+        self.last_damage = time.time()
+        self.show_rate = 0.1
+        self.show_count = 0
+        self.shouldDisappear = False
         
         sounds.rocket_sound.play(-1)
         
@@ -188,6 +195,22 @@ class Spaceship(pygame.sprite.Sprite):
             else:
                 self.anim_count = 0
             self.image = self.animations[self.anim_count]
+            
+        if self.shouldDisappear:
+            if time.time() - self.last_damage > self.show_rate:
+                if self.shouldShow == False:
+                    self.shouldShow = True
+                else:
+                    self.shouldShow = False
+                
+                self.show_count += 1
+                self.last_damage = time.time()
+                
+                if self.show_count >= 10:
+                    self.shouldDisappear = False
+                    self.shouldShow = True
+                    self.show_count = 0
+                
 
 class Asteroid(pygame.sprite.Sprite):
     

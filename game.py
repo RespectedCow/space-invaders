@@ -142,6 +142,17 @@ try:
                     
                     # Destroy the bullet
                     bullet.kill()
+                    
+            if asteroid.rect.colliderect(player.rect):
+                player.hp -= 1
+                
+                if player.hp <= 0:
+                    # Game end
+                    print("You lose!")
+                    quit()
+                
+                asteroid.kill()
+                player.shouldDisappear = True
         
         # if time.time() - last_shake > 0.3:
         #     offset = shake(offset)
@@ -151,16 +162,19 @@ try:
         
         display_surfaces([
             (gameBackground.image, gameBackground.rect),
-            (player.image, player.rect),
             (score_label[0], score_label[1])
         ])
+        
+        if player.shouldShow:
+            screen.blit(player.image, player.rect)
         
         display_surfaces(player.bullets)
         display_surfaces(asteroidGenerator.asteroids)
         
         org_screen.blit(screen, offset)
         
-        pygame.display.update()
+        pygame.display.flip()
+        # pygame.display.update()
         clock.tick(60)
         
 except Exception as error:
